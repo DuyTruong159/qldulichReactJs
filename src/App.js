@@ -1,25 +1,30 @@
-import logo from './logo.svg';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
+import Footer from './Footer';
+import Headers from './Header';
+import { Route, BrowserRouter, Switch, Link } from 'react-router-dom';
+import Body from './Body';
+import CustomerProtect from './CustomerProtect';
+import Contact from './Contact';
+import AboutUs from './AboutUs';
+import Tour from './Tour';
 
-function App() {
+
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <>
+        <BrowserRouter>
+        <Headers />
+        <Switch>
+          <Route exact path = "/" component={Body}/>
+          <Route exact path = "/customer_protect" component={CustomerProtect}/>
+          <Route exact path = "/contact" component={Contact}/>
+          <Route exact path = "/about_us" component={AboutUs}/>
+          <Route exact path = "/tour" component={Tour}/>
+        </Switch>
+        </BrowserRouter>
+        <Footer />
+      </>
   );
 }
 
-export default App;
