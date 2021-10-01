@@ -1,99 +1,194 @@
-import React, { useEffect, useState } from "react"
-import { Row } from "react-bootstrap"
-import { Link } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { Alert, Button, Form, Row } from "react-bootstrap"
+import { BrowserRouter, Link, Route, Switch } from "react-router-dom"
+import { useHistory, useLocation } from "react-router"
 import API, { endpoints } from "./API"
+import TourInfo from "./TourInfo"
 
-export default class Tour extends React.Component {
-    constructor() {
-        super()
-        this.state = {
-            'tour': [],
-            'page': 0
-        }
-    }
-
-    loadTour = (page="?page=1") => {
-        API.get(`${endpoints['toursHome']}${page}`).then(res => {
-            console.info(res)
-            this.setState({
-                'tour': res.data.results,
-                'page': res.data.count
-            })
-        })
-    }
-    componentDidMount() {
-        this.loadTour()
-    }
-
-    componentDidUpdate() {
-        this.loadTour(this.props.location.search)
-    }
-
-    render() {
-        let items = []
-        for (let i = 0; i < Math.ceil(this.state.page/12); i++) {
-            items.push(
-                <Link to={"/tour?page=" + (i+1)} className="page-numbers">{i+1}</Link>
-            )
-        }
-        return(
-            <>
-            <main className="content">
-                <div className="fullwidth-block">
-                    <div className="container">
-                        <div className="filter-links filterable-nav">
-                            <select className="mobile-filter">
-                                <option value=".south-america">South America</option>
-                                <option value=".asia">Asia</option>
-                                <option value=".africa">Africa</option>
-                                <option value=".north-america">North America</option>
-                                <option value=".europe">Europe</option>
-                                <option value=".australia">Australia</option>	
-                            </select>
-                            <a href="#" className="wow fadeInRight" data-wow-delay=".2s" data-filter=".south-america">Boat</a>
-                            <a href="#" className="wow fadeInRight" data-wow-delay=".4s" data-filter=".asia">Mountain</a>
-                            <a href="#" className="wow fadeInRight" data-wow-delay=".6s" data-filter=".africa">Africa</a>
-                            <a href="#" className="wow fadeInRight" data-wow-delay=".8s" data-filter=".north-america">North America</a>
-                            <a href="#" className="wow fadeInRight" data-wow-delay="1s" data-filter=".europe">Europe</a>
-                            <a href="#" className="wow fadeInRight" data-wow-delay="1.2s" data-filter=".australia">Australia</a>
-                        </div>
-                        <div className="filterable-items">
-                            <Row xs={1} md={3}> 
-                            {this.state.tour.map(t => <TourItem image={t.image} name={t.name} description={t.description}
-                                                        adultP={t.seats[0].price} adultT={t.seats[0].name}
-                                                        childP={t.seats[1].price} childT={t.seats[1].name}/>)}
-                            </Row>
-                        </div>
-                    </div>
-                    <div className="pagination wow fadeInUp justify-content-center">
-                            {items}
-                        </div>
-                </div>
-            </main>
-            </>
-        )
-    } 
-}
-
-function TourItem(props) {
+export default function Tour() {
     return(
         <>
-        <div className={`filterable-item ${props.tag}`}>
-            <article className="offer-item">
-                <figure className="featured-image">
-                    <img src={props.image} alt={props.name} width="118" height="210"/>
-                </figure>
-                <h2 className="entry-title"><a href="#">{props.name}</a></h2>
-                <p>{props.description}</p>
-                <div className="price pl-2">
-                    <strong>{props.adultP} USD</strong>
-                    <small>/{props.adultT}</small>
-                </div>
-                <div className="price pl-2">
-                    <strong>{props.childP} USD</strong>
-                    <small>/{props.childT}</small>
-                </div>
-            </article>
+        <main className="content">
+        <div className="fullwidth-block">
+            <BrowserRouter>
+            <div className="container">
+                <Tag/>
+                <Switch>
+                    <Route exact path ="/tour" component={TourAll}/>
+                    <Route exact path ="/tag_boat" component={TourBoat}/>
+                    <Route exact path ="/tag_mountain" component={TourMountain}/>
+                    <Route exact path ="/tag_climbing" component={TourClimbing}/>
+                    <Route exact path = "/tour_info/:tourId/" component={TourInfo}/>
+                </Switch>
+            </div>
+            </BrowserRouter>
+        </div>
+        </main>
+        </>
+    )
+}
+
+function Tag(props) {
+    let history = useHistory()
+    const [kw, setKw] = useState("")
+
+    const Search = (event) => {
+        event.preventDefault()
+
+        history.push(`/tour?kw=${kw}`)
+    }
+
+    return(
+        <>
+        <Form className="pb-5" onSubmit={Search}>
+                <Form.Control type="search" placeholder="Searching..." className="col-md-10" onChange={(event) => setKw(event.target.value)} />
+                <Button variant="primary" type="submit" className="ml-5">
+                    Search
+                </Button>
+        </Form>
+        <div className="filter-links filterable-nav">
+            <select className="mobile-filter">
+            <option value="*">Show all</option>
+            <option value=".south-america">Boat</option>
+            <option value=".asia">Asia</option>
+            <option value=".africa">Africa</option>
+            <option value=".north-america">North America</option>
+            <option value=".europe">Europe</option>
+            <option value=".australia">Australia</option>	
+            </select>
+            <Link to ="/tour" className="current wow fadeInRight" data-filter="*">Show All</Link>
+            <Link to ="/tag_boat" className="wow fadeInRight" data-wow-delay=".2s" data-filter=".south-america">Boat</Link>
+            <Link to ="/tag_mountain" className="wow fadeInRight" data-wow-delay=".4s" data-filter=".asia">Mountain</Link>
+            <Link to ="/tag_climbing" className="wow fadeInRight" data-wow-delay=".6s" data-filter=".africa">Climbing</Link>
+        </div>
+        </>
+    )
+}
+
+function TourAll(props) {
+    const [tourAll, setTourAll] = useState([])
+    const [count, setCount] = useState([])
+    const [validate, setValidate] = useState()
+    let url = useLocation()
+    let items = []
+
+    useEffect(async () => {
+        let page = url.search
+        try {
+            let res = await API.get(`${endpoints['tours']}${page}`)
+            console.info(res)
+            console.info(page)
+            setTourAll(res.data.results)
+            setCount(res.data.count)
+            setValidate(res.data.count)
+        } catch (err) {
+            console.info(err)
+        }
+    }, [url])
+
+    for(let i = 0; i < Math.ceil(count/6); i++) {
+        items.push(<a href={`?page=${i+1}`} className="page-numbers">{i+1}</a>)
+    }
+
+    if(validate === 0) {
+        return(
+            <>
+            <Alert key="danger" variant="danger">
+                Không có Tour bạn kiếm!!!
+            </Alert>
+            </>
+        )
+    }
+
+    return(
+        <>
+        <Row md={3} xs={1}>
+            {tourAll.map(t => <TourItems tour={t}/>)}   
+        </Row>
+        <div className="pagination wow fadeInUp justify-content-center">
+            {items}
+        </div>
+        </>
+    )
+}
+
+function TourBoat(props) {
+    const [tourBoat, setTourBoat] = useState([])
+
+    useEffect(async () => {
+        let res = await API.get(endpoints['tagsBoat'])
+        console.info(res)
+        setTourBoat(res.data.tour)
+    }, [])
+
+    return(
+        <>
+        <Row md={3} xs={1}>
+            {tourBoat.map(t => <TourItems tour={t}/>)}   
+        </Row>
+        </>
+    )
+}
+
+function TourMountain(props) {
+    const [tourMount, setTourMount] = useState([])
+
+    useEffect(async () => {
+        let res = await API.get(endpoints['tagsMount'])
+        console.info(res)
+        setTourMount(res.data.tour)
+    }, [])
+
+    return(
+        <>
+        <Row md={3} xs={1}>
+            {tourMount.map(t => <TourItems tour={t}/>)}   
+        </Row>
+        </>
+    )
+}
+
+function TourClimbing(props) {
+    const [tourClimb, setTourClimb] = useState([])
+
+    useEffect(async () => {
+        let res = await API.get(endpoints['tagsClimb'])
+        console.info(res)
+        setTourClimb(res.data.tour)
+    }, [])
+
+    return(
+        <>
+        <Row md={3} xs={1}>
+            {tourClimb.map(t => <TourItems tour={t}/>)}   
+        </Row>
+        </>
+    )
+}
+
+function TourItems(props) {
+    let path = `/tour_info/${props.tour.id}/`
+
+    return(
+        <>
+        <div className="filterable-item p-4">
+            <div className="filterable-items">
+                <article className="offer-item">
+                    <figure className="featured-image">
+                        <Link to={path}><img src={props.tour.image} alt={props.tour.name} width="118" height="210"/></Link>
+                    </figure>
+                    <h2 className="entry-title"><Link to={path}>{props.tour.name}</Link></h2>
+                    <p>{props.tour.description}</p>
+                    <div className="price pl-2">
+                        <strong>{props.tour.seats[0].price} USD</strong>
+                        <small>/{props.tour.seats[0].name}</small>
+                    </div>
+                    <div className="price pl-2">
+                        <strong>{props.tour.seats[1].price} USD</strong>
+                        <small>/{props.tour.seats[1].name}</small>
+                    </div>
+                </article>
+            </div>
         </div>
         </>
     )

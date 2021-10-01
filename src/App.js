@@ -2,12 +2,13 @@
 import './App.css';
 import Footer from './Footer';
 import Headers from './Header';
-import { Route, BrowserRouter, Switch, Link } from 'react-router-dom';
+import { Route, BrowserRouter, Switch } from 'react-router-dom';
 import Body from './Body';
 import CustomerProtect from './CustomerProtect';
 import Contact from './Contact';
 import AboutUs from './AboutUs';
 import Tour from './Tour';
+import TourInfo from './TourInfo';
 
 
 export default function App() {
@@ -21,9 +22,10 @@ export default function App() {
           <Route exact path = "/contact" component={Contact}/>
           <Route exact path = "/about_us" component={AboutUs}/>
           <Route exact path = "/tour" component={Tour}/>
+          <Route exact path = "/tour_info/:tourId" component={TourInfo}/>
         </Switch>
-        </BrowserRouter>
         <Footer />
+        </BrowserRouter>
       </>
   );
 }
