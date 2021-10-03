@@ -118,7 +118,7 @@ export default function Headers() {
         path = <>
             <li className="menu-item float-right">
                 <NavDropdown title={user.username} id="basic-nav-dropdown">
-                    <NavDropdown.Item className="p-2 text-center" href="javascript:;">Profile</NavDropdown.Item>
+                    <NavDropdown.Item className="p-2 text-center" href={`/profile?u=${user.id}`}>Profile</NavDropdown.Item>
                     <NavDropdown.Item className="p-2 text-center" href="javascript:;" onClick={Logout}>Logout</NavDropdown.Item>
                 </NavDropdown>
             </li>

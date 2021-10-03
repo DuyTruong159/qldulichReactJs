@@ -9,6 +9,7 @@ import Contact from './Contact';
 import AboutUs from './AboutUs';
 import Tour from './Tour';
 import TourInfo from './TourInfo';
+import Profile from './Profile';
 
 
 export default function App() {
@@ -23,6 +24,7 @@ export default function App() {
           <Route exact path = "/about_us" component={AboutUs}/>
           <Route exact path = "/tour" component={Tour}/>
           <Route exact path = "/tour_info/:tourId" component={TourInfo}/>
+          <Route exact path = "/profile" component={Profile}/>
         </Switch>
         <Footer />
         </BrowserRouter>

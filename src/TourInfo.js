@@ -71,7 +71,7 @@ export default function TourInfo() {
         try {
             let res = await API.post(endpoints['add_ticket'](tourId), {
                 "quantity": quantity,
-                // "seat": tourInfo.seats[0]
+                "price": tourInfo.seats[0].price * quantity
             }, {
                 headers: {
                     'Authorization': `Bearer ${cookies.load('access_token')}`
@@ -93,7 +93,7 @@ export default function TourInfo() {
         try {
             let res = await API.post(endpoints['add_ticket'](tourId), {
                 "quantity": quantity,
-                "seat": tourInfo.seats[1]
+                "price": tourInfo.seats[1].price * quantity
             }, {
                 headers: {
                     'Authorization': `Bearer ${cookies.load('access_token')}`
