@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react"
+import Rating from "react-rating"
 import { useLocation } from "react-router"
 import { Link } from "react-router-dom"
 import Safe from "react-safe"
 import API, { endpoints } from "./API"
+import avatar from "./images/avatar.png"
 
 export default function Body() {
     const [tourSlide, setTourSlide] = useState([])
     const [tourHome, setTourHome]= useState([])
     const [count, setCount] = useState([])
+    const [customer, setCustomer] = useState([])
     let url = useLocation()
     let items = []
 
@@ -21,6 +24,10 @@ export default function Body() {
         console.info(resHome)
         setTourHome(resHome.data.results)
         setCount(resHome.data.count) 
+
+        let resCustomer = await API.get(endpoints['customer_slide'])
+        console.info(resCustomer)
+        setCustomer(resCustomer.data)
     }, [])  
 
     for(let i = 0; i < Math.ceil(count/8); i++) {
@@ -82,48 +89,9 @@ export default function Body() {
             </div>
             <div className="fullwidth-block testimonial-section">
                 <div className="container">
-                <h2 className="section-title">Testimonials</h2>
+                <h2 className="section-title">Customers</h2>
                 <div className="row">
-                    <div className="col-md-3 col-sm-6 col-xs-12">
-                    <div className="testimonial wow fadeInUp">
-                        <figure className="avatar"><img src="dummy/person-1.jpg" alt="" /></figure>
-                        <blockquote className="testimonial-body">
-                        <p>Consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet.</p>
-                        <cite>Jessica Tracy</cite>
-                        <span>Creative agency CEO</span>
-                        </blockquote>
-                    </div>
-                    </div>
-                    <div className="col-md-3 col-sm-6 col-xs-12">
-                    <div className="testimonial wow fadeInUp" data-wow-delay=".2s">
-                        <figure className="avatar"><img src="dummy/person-2.jpg" alt="" /></figure>
-                        <blockquote className="testimonial-body">
-                        <p>Consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet.</p>
-                        <cite>John Smith</cite>
-                        <span>Traveler</span>
-                        </blockquote>
-                    </div>
-                    </div>
-                    <div className="col-md-3 col-sm-6 col-xs-12">
-                    <div className="testimonial wow fadeInUp" data-wow-delay=".4s">
-                        <figure className="avatar"><img src="dummy/person-3.jpg" alt="" /></figure>
-                        <blockquote className="testimonial-body">
-                        <p>Consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet.</p>
-                        <cite>Susan Webb</cite>
-                        <span>Hairdresser</span>
-                        </blockquote>
-                    </div>
-                    </div>
-                    <div className="col-md-3 col-sm-6 col-xs-12">
-                    <div className="testimonial wow fadeInUp" data-wow-delay=".6s">
-                        <figure className="avatar"><img src="dummy/person-4.jpg" alt="" /></figure>
-                        <blockquote className="testimonial-body">
-                        <p>Consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet.</p>
-                        <cite>Sarah Brown</cite>
-                        <span>Athlete</span>
-                        </blockquote>
-                    </div>
-                    </div>
+                    {customer.map(c => <CustomerSlide customer={c}/>)}
                 </div>
                 </div>
             </div>
@@ -159,6 +127,30 @@ function TourHome(props) {
                                 : <span style={{display: 'block'}} className="pl-3"><i className="bi bi-x-circle" style={{marginRight: '15px', color: 'red'}}></i>Unavailable</span>}
                 <a href="#" className="button">See details</a>
             </article>
+        </div>
+    )
+}
+
+function CustomerSlide(props) {
+    return(
+        <div className="col-md-3 col-sm-6 col-xs-12">
+            <div className="testimonial wow fadeInUp" data-wow-delay=".2s">
+                <figure className="avatar"><img src={avatar} alt="" /></figure>
+                <blockquote className="testimonial-body">
+                <p>{props.customer.name}</p>
+                <cite>{props.customer.user.first_name} {props.customer.user.last_name}</cite>
+                    <Rating
+                        stop={5}
+                        emptySymbol={['fa fa-star-o fa-2x medium', 'fa fa-star-o fa-2x medium',
+                            'fa fa-star-o fa-2x medium', 'fa fa-star-o fa-2x medium',
+                            'fa fa-star-o fa-2x medium']}
+                        fullSymbol={['fa fa-star fa-2x medium', 'fa fa-star fa-2x medium',
+                            'fa fa-star fa-2x medium', 'fa fa-star fa-2x medium',
+                            'fa fa-star fa-2x medium']}
+                        initialRating={props.customer.rating}
+                    />
+                </blockquote>
+            </div>
         </div>
     )
 }

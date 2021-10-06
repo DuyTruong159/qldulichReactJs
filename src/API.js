@@ -17,7 +17,8 @@ export let endpoints = {
     "add_comment": (tourId) => `/Tour/${tourId}/add_comment/`,
     "delete_comment": (commentId) => `/Comment/${commentId}/`,
     "add_ticket": (tourId) => `/Tour/${tourId}/add_ticket/`,
-    "ticket": "/ticket/"
+    "ticket": "/ticket/",
+    "customer_slide": "/Comment/customer_slide/"
 }
 
 export default axios.create({
